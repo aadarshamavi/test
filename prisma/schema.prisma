@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -38,34 +35,72 @@ model Session {
 }
 
 model User {
-  id         String        @id @default(cuid())
+  id         String           @id @default(cuid())
   name       String
-  email      String        @unique
+  email      String           @unique
   image      String
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
   accounts   Account[]
   sessions   Session[]
   Room       Room[]
-  JoinedRoom JoinedRooms[]
+  JoinedRoom RoomEnrollment[]
+  Assignment Assignment[]
+  Comment    Comment[]
 }
 
 model Room {
-  id          String        @id @default(cuid())
-  name        String
-  section     String
-  key         String        @unique
-  admin       User          @relation(fields: [adminId], references: [id])
-  adminId     String
-  JoinedRooms JoinedRooms[]
+  id             String           @id @default(cuid())
+  name           String
+  section        String
+  key            String           @unique
+  admin          User             @relation(fields: [adminId], references: [id])
+  adminId        String
+  RoomEnrollment RoomEnrollment[]
+  created_at     DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  Assignment     Assignment[]
 }
 
-model JoinedRooms {
-  id     String @id @default(cuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-  room   Room   @relation(fields: [roomId], references: [id])
-  roomId String
+model RoomEnrollment {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  room       Room     @relation(fields: [roomId], references: [id])
+  roomId     String
+  created_at DateTime @default(now())
+}
+
+model Assignment {
+  id             String           @id @default(cuid())
+  title          String
+  description    String?
+  dueDate        DateTime
+  created_at     DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id])
+  userId         String
+  room           Room             @relation(fields: [roomId], references: [id])
+  roomId         String
+  AssignmentFile AssignmentFile[]
+  Comment        Comment[]
+}
+
+model AssignmentFile {
+  id           String     @id @default(cuid())
+  fileName     String
+  fileType     String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+}
+
+model Comment {
+  id           String     @id @default(cuid())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
+  comment      String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
 }
 
 model VerificationRequest {
